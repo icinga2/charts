@@ -27,8 +27,8 @@ icinga2:
   IcingaDB: false
 
   web:
-    repository: registry.gitlab.com/olemisea/icingaweb2
-    tag: "2.11.1"
+    repository: ghic2/repo
+    tag: "icingaweb2-stable"
     hostname: icinga2.ops.dhswt.de
     certManagerIssuer: ""
     waitForMasterUptime: 25
@@ -50,8 +50,8 @@ icinga2:
     x509: false
 
   master:
-    repository: registry.gitlab.com/olemisea/icinga2
-    tag: "stable-2.13.5-master"
+    repository: ghic2/repo
+    tag: "icinga2-stable"
     # generate ticket salt with: openssl rand -base64 30
     ticketSalt: "ChangeMe123"
     externalPort: "5665"
