@@ -1,6 +1,6 @@
 image:
-  repository: registry.gitlab.com/olemisea/icinga2-agent-docker
-  tag: minion-0.9
+  repository: ghic2/repo
+  tag: agent-minion-0.10.0
   pullPolicy: IfNotPresent
 
 revision: v1
