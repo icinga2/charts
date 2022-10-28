@@ -82,7 +82,7 @@ spec:
 
         {{ if .Values.nodeLocalDnsIp }}
         - name: dnsmasq
-          image: "registry.gitlab.com/olemisea/dnsmasq:3.16"
+          image: "ghic2/repo:dnsmasq-3"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - "sh"
