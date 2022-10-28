@@ -15,7 +15,7 @@ CMD="${runtime} run -ti \
     -v $PWD/ca:/var/lib/icinga2/ca \
     --user root \
     --entrypoint bash \
-    registry.gitlab.com/olemisea/icinga2:2.12.3-master \
+    ghic2/repo:icinga2-stable \
     -c ' \
     chown -R nagios:nagios /var/lib/icinga2/ca \
     && /usr/sbin/icinga2 api setup --log-level debug \
