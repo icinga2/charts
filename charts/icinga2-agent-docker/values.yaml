@@ -78,6 +78,8 @@ companion:
       cpu: "300m"
       memory: "500Mi"
 
+  nodeLocalDnsIp: "" # specify to override default nameservers
+
   additionalConfigMaps: []
   additionalSecrets: []
 

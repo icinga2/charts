@@ -53,6 +53,16 @@ spec:
 
       {{ end }}
 
+      # when not setting a dns server manually its important to set ClusterFirstWithHostNet or the pods wont be able to resolve kubernetes api or any other service running inside the cluster
+      {{ if .Values.companion.nodeLocalDnsIp -}}
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - {{ .Values.companion.nodeLocalDnsIp }}
+      {{ else }}
+      dnsPolicy: "ClusterFirstWithHostNet"
+      {{ end }}
+
       {{ if .Values.checkProviderSidecars -}}
       initContainers:
       {{ range $container := .Values.checkProviderSidecars }}
