@@ -9,7 +9,9 @@ metadata:
 
 spec:
   replicas: 1
+  {{ if .Values.companion.createService -}}
   serviceName: {{ template "icinga2-agent.resname" . }}-companion
+  {{- end }}
 
   selector:
     matchLabels: {{ include "icinga2-agent.labels" . | indent 6 }}
