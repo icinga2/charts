@@ -59,6 +59,13 @@ spec:
       dnsConfig:
         nameservers:
           - {{ .Values.companion.nodeLocalDnsIp }}
+        searches:
+          - {{ .Release.Namespace }}.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        options:
+          - name: ndots
+            value: "2"
       {{ else }}
       dnsPolicy: "ClusterFirstWithHostNet"
       {{ end }}
