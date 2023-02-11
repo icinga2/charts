@@ -87,6 +87,26 @@ entries:
     version: 0.10.0
   icinga2-agent:
   - apiVersion: v1
+    appVersion: 0.10.2
+    created: "2023-02-11T07:59:45.045138296Z"
+    description: Icinga2 Agent
+    digest: 7ac84819039736a92e885a7e8a6c759576303df54aa3fe3b40916acd425bbe53
+    home: https://gitlab.com/olemisea/icinga2-agent-docker
+    keywords:
+    - icinga
+    - icinga2
+    - agent
+    - monitoring
+    maintainers:
+    - email: david.hiendl@dhswt.de
+      name: David Hiendl
+    name: icinga2-agent
+    sources:
+    - https://gitlab.com/olemisea/icinga2-agent-docker
+    urls:
+    - https://github.com/icinga2/charts/releases/download/icinga2-agent-0.10.3/icinga2-agent-0.10.3.tgz
+    version: 0.10.3
+  - apiVersion: v1
     appVersion: 0.9.33
     created: "2023-02-10T19:08:59.383703577Z"
     description: Icinga2 Agent
@@ -126,4 +146,4 @@ entries:
     urls:
     - https://github.com/icinga2/charts/releases/download/icinga2-agent-0.10.1/icinga2-agent-0.10.1.tgz
     version: 0.10.1
-generated: "2023-02-10T19:08:59.383714877Z"
+generated: "2023-02-11T07:59:45.045151796Z"
