@@ -63,6 +63,7 @@ checkProviderSidecars: []
 
 companion:
   enable: true
+  createService: false
   instanceType: "companion"
   nodeSelector: {}
   push: 1 # probably wont work with poll unless cluster fqdn port 5665 points to companion
