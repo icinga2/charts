@@ -1,7 +1,7 @@
 apiVersion: v2
 description: Icinga2 Master
 name: icinga2
-version: 0.10.2
+version: 0.10.3
 appVersion: 2.13.5
 keywords:
 - icinga
@@ -9,10 +9,10 @@ keywords:
 - master
 - web
 - monitoring
-home: https://gitlab.com/gitlab.com/olemisea/icinga2-master-chart
+home: https://github.com/icinga2/icinga2
 icon: https://icinga.com/wp-content/uploads/2018/04/icinga-logo-icon-inverted-512.png
 sources:
-- https://gitlab.com/gitlab.com/olemisea/icinga2-master-chart
+- https://github.com/icinga2/icinga2
 maintainers:
 - name: David Hiendl
   email: david.hiendl@dhswt.de
