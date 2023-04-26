@@ -1,6 +1,9 @@
-# Icinga2 Helm Charts
+**This project has no relation to Icinga 2 monitoring system and is a private collection of monitoring projects. It's also not affliated with the company Netways.**
 
-[Helm](https://helm.sh/) repo for Icinga2 maintained charts which can be installed on [Kubernetes](https://kubernetes.io/)
+
+# IC2 Helm Charts
+
+[Helm](https://helm.sh/) repo for IC2
 
 ## Repo Info
 
