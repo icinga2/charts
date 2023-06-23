@@ -144,6 +144,7 @@ icinga2:
     hostname: master-1.test.com
     CanonicalName: master-1
     nodeAffinity: []
+    externalPort: 443
     pvc:
       storageClass: "default"
       size: 10Gi
