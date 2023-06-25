@@ -1,6 +1,6 @@
 image:
   repository: ghic2/repo
-  tag: agent-minion-0.10.0
+  tag: agent-minion-0.11.0
   pullPolicy: IfNotPresent
 
 revision: v1
@@ -18,6 +18,7 @@ master:
   ip: "master1.icinga2.example.com"
   ip2: "" # master2.icinga2.example.com
   port: 5665
+  port2: 5665
 
   healthcheck:
     user: ""
