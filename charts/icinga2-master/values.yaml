@@ -149,6 +149,7 @@ icinga2:
       storageClass: "default"
       size: 10Gi
     initContainers: []
+    ingress: true
 
   master2:
     hostname: master-2.test.com
@@ -159,6 +160,7 @@ icinga2:
       storageClass: "default"
       size: 10Gi
     initContainers: []
+    ingress: true
 
 ingress:
   className: ""

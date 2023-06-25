@@ -1,3 +1,4 @@
+{{ if .Values.icinga2.master1.ingress }}
 {{- $fullName := include "icinga2.fullname" . }}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
@@ -43,3 +44,4 @@ spec:
               serviceName: {{ $fullName }}-master-1
               servicePort: 5665
               {{- end }}
+{{ end }}
