@@ -165,9 +165,15 @@ icinga2:
 ingress:
   className: ""
   pathType: Prefix
-  annotations:
-    ingress.kubernetes.io/ssl-passthrough: "true"
-    icinga2-k8s-check/ingress-insecure-skip-verify: "true"
+  annotations: []
+    # HAProxy:
+    # ingress.kubernetes.io/ssl-passthrough: "true"
+    # icinga2-k8s-check/ingress-insecure-skip-verify: "true"
+    #
+    # Nginx:
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    # nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
 #resources:
 #  requests:
