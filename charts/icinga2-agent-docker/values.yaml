@@ -34,6 +34,7 @@ agent:
   enable: true
   push: 0
   networkInterface: "eth0"
+  useIfaceIpAsEndpoint: false
   hostDistribution: "" # auto-detected if possible
   hostDistributionVersion: ""  # auto-detected if possible
   rootDevice: "" # auto-detected if possible

@@ -71,10 +71,15 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            {{ if .values.agent.useIfaceIpAsEndpoint }}
+            - name: IC2_AGENT_ENDPOINT
+              value: "IP"
+            {{ else }}
             - name: IC2_AGENT_ENDPOINT
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            {{ end }}
           envFrom:
             - secretRef:
                 name: {{ template "icinga2-agent.resname" . }}-agent
