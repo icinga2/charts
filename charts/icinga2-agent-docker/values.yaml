@@ -1,6 +1,6 @@
 image:
   repository: ghic2/repo
-  tag: agent-minion-0.11.0
+  tag: agent-minion-0.12.1
   pullPolicy: IfNotPresent
 
 revision: v1

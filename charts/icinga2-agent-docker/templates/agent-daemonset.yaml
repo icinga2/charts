@@ -71,7 +71,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-            {{ if .values.agent.useIfaceIpAsEndpoint }}
+            {{ if .Values.agent.useIfaceIpAsEndpoint }}
             - name: IC2_AGENT_ENDPOINT
               value: "IP"
             {{ else }}
