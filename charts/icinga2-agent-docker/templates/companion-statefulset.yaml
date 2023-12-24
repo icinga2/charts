@@ -14,7 +14,7 @@ spec:
   {{- end }}
 
   selector:
-    matchLabels: {{ include "icinga2-agent.labels" . | indent 6 }}
+    matchLabels: {{ include "icinga2-agent.labels-selector" . | indent 6 }}
       component: companion
 
   template:
