@@ -7,7 +7,6 @@ metadata:
     component: icinga2-master-1
 
 spec:
-
   replicas: 1
   strategy:
     type: Recreate
@@ -25,6 +24,8 @@ spec:
         component: icinga2-master-1
 
     spec:
+      serviceAccountName: icinga
+
       # this prevents env variables for services in this namespace from being generated, as those might conflict
       enableServiceLinks: false
       {{ if .Values.icinga2.master1.CanonicalName -}}
