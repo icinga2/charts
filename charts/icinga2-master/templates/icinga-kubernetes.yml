@@ -77,17 +77,18 @@ spec:
         {{- include "icinga2.selectorLabels" . | nindent 8 }}
         component: icinga2-kubernetes
 
-  serviceAccountName: icinga-kubernetes
-  # this prevents env variables for services in this namespace from being generated, as those might conflict
-  enableServiceLinks: false
-  containers:
-    - name: icinga-kubernetes
-      image: icinga/icinga-kubernetes:edge
-      volumeMounts:
+    spec:
+      serviceAccountName: icinga-kubernetes
+      # this prevents env variables for services in this namespace from being generated, as those might conflict
+      enableServiceLinks: false
+      containers:
+        - name: icinga-kubernetes
+          image: icinga/icinga-kubernetes:edge
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config.yml
+              subPath: config.yml
+      volumes:
         - name: config-volume
-          mountPath: /config.yml
-          subPath: config.yml
-  volumes:
-    - name: config-volume
-      configMap:
-        name: icinga-kubernetes-config
+          configMap:
+            name: icinga-kubernetes-config
