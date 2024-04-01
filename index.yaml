@@ -3,6 +3,34 @@ entries:
   icinga2:
   - apiVersion: v2
     appVersion: 2.14.2
+    created: "2024-04-01T08:18:30.850370912Z"
+    dependencies:
+    - alias: grafana
+      condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 6.22.0
+    description: Icinga2 Master
+    digest: e29ec6382627974bf86505c6dd6ae62b131ac63260ce02d72bb8c8a787c5fbb7
+    home: https://github.com/icinga2/icinga2
+    icon: https://icinga.com/wp-content/uploads/2018/04/icinga-logo-icon-inverted-512.png
+    keywords:
+    - icinga
+    - icinga2
+    - master
+    - web
+    - monitoring
+    maintainers:
+    - email: david.hiendl@dhswt.de
+      name: David Hiendl
+    name: icinga2
+    sources:
+    - https://github.com/icinga2/icinga2
+    urls:
+    - https://github.com/icinga2/charts/releases/download/icinga2-0.14.3/icinga2-0.14.3.tgz
+    version: 0.14.3
+  - apiVersion: v2
+    appVersion: 2.14.2
     created: "2024-04-01T08:13:49.271974897Z"
     dependencies:
     - alias: grafana
@@ -642,4 +670,4 @@ entries:
     urls:
     - https://github.com/icinga2/charts/releases/download/icinga2-agent-0.10.1/icinga2-agent-0.10.1.tgz
     version: 0.10.1
-generated: "2024-04-01T08:13:49.272119608Z"
+generated: "2024-04-01T08:18:30.850476389Z"
