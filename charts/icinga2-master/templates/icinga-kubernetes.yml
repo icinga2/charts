@@ -48,10 +48,10 @@ data:
       port: 3306
 
       # Database name.
-      database: {{ .Values.icinga2.mysql.ic2UserPrefix }}icingadb
+      database: {{ .Values.icinga2.mysql.ic2UserPrefix }}kubernetes
 
       # Database user.
-      user: {{ .Values.icinga2.mysql.ic2UserPrefix }}icinga
+      user: {{ .Values.icinga2.mysql.ic2UserPrefix }}kubernetes
 
       # Database password.
       password: {{ .Values.icinga2.mysql.ic2UserPass | quote }}
