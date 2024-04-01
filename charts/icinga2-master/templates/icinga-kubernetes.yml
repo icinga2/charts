@@ -56,13 +56,30 @@ data:
       # Database password.
       password: {{ .Values.icinga2.mysql.ic2UserPass | quote }}
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: icinga-kubernetes
   namespace: "{{ .Release.Namespace }}"
 spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+
+  selector:
+    matchLabels:
+      {{- include "icinga2.selectorLabels" . | nindent 6 }}
+      component: icinga2-kubernetes
+
+  template:
+    metadata:
+      labels:
+        {{- include "icinga2.selectorLabels" . | nindent 8 }}
+        component: icinga2-kubernetes
+
   serviceAccountName: icinga-kubernetes
+  # this prevents env variables for services in this namespace from being generated, as those might conflict
+  enableServiceLinks: false
   containers:
     - name: icinga-kubernetes
       image: icinga/icinga-kubernetes:edge

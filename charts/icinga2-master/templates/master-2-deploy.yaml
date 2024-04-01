@@ -26,7 +26,6 @@ spec:
         component: icinga2-master-2
 
     spec:
-      serviceAccountName: icinga
       # this prevents env variables for services in this namespace from being generated, as those might conflict
       enableServiceLinks: false
       {{ if .Values.icinga2.master2.CanonicalName -}}
