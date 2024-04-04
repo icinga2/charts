@@ -25,6 +25,7 @@ kickstart:
 icinga2:
 
   IcingaDB: false
+  IcingaKubernetes: false
 
   web:
     repository: ghic2/repo

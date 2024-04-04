@@ -1,3 +1,4 @@
+{{ if .Values.icinga2.IcingaKubernetes }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -92,3 +93,4 @@ spec:
         - name: config-volume
           configMap:
             name: icinga-kubernetes-config
+{{- end }}
