@@ -1,0 +1,206 @@
+suite: "[Icinga Web] Deployment"
+templates:
+  - ../charts/icingaweb2/templates/deployment.yaml
+tests:
+  - it: deploys an Icinga Web deployment with minimal configuration
+    values:
+      - required_values.yaml
+    release:
+      name: my-icinga
+    asserts:
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+      - equal:
+          path: metadata.name
+          value: my-icinga-icingaweb2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.enabledModules
+            value: director,icingadb,incubator,kubernetes,
+          any: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.passwords.icingaweb2.icingaadmin
+            value: insecurepassword
+
+  - it: deploys an Icinga Web deployment with additional modules
+    values:
+      - required_values.yaml
+    set:
+      icingaweb2:
+        auth:
+          admin_password:
+            value: insecurepassword
+        modules:
+          x509:
+            enabled: true
+    release:
+      name: my-icinga
+    asserts:
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+      - equal:
+          path: metadata.name
+          value: my-icinga-icingaweb2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.enabledModules
+            value: director,icingadb,incubator,kubernetes,x509,
+          any: true
+  
+  - it: deploys an Icinga Web deployment with minimal configuration using secrets
+    values:
+      - required_values_secrets.yaml
+    release:
+      name: my-icinga
+    asserts:
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+      - equal:
+          path: metadata.name
+          value: my-icinga-icingaweb2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.enabledModules
+            value: director,icingadb,incubator,kubernetes,
+          any: true
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.passwords.icingaweb2.icingaadmin
+            valueFrom:
+              secretKeyRef:
+                name: icingaweb2-secret
+                key: admin_password
+
+  - it: deploys an Icinga Web deployment with graphite
+    values:
+      - required_values.yaml
+    set:
+      icingaweb2:
+        auth:
+          admin_password:
+            value: insecurepassword
+        modules:
+          graphite:
+            enabled: true
+    release:
+      name: my-icinga
+    asserts:
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+      - equal:
+          path: metadata.name
+          value: my-icinga-icingaweb2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.enabledModules
+            value: director,graphite,icingadb,incubator,kubernetes,
+          any: true
+
+  - it: deploys an Icinga Web deployment with graphite, user/password from value
+    values:
+      - required_values.yaml
+    set:
+      icingaweb2:
+        auth:
+          admin_password:
+            value: insecurepassword
+        modules:
+          graphite:
+            enabled: true
+            graphite:
+              user:
+                value: graphite-user
+              password:
+                value: graphite-password
+    release:
+      name: my-icinga
+    asserts:
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+      - equal:
+          path: metadata.name
+          value: my-icinga-icingaweb2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.modules.graphite.config.graphite.user
+            value: graphite-user
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.modules.graphite.config.graphite.password
+            value: graphite-password
+
+  - it: deploys an Icinga Web deployment with graphite, user/password from secret
+    values:
+      - required_values.yaml
+    set:
+      icingaweb2:
+        auth:
+          admin_password:
+            value: insecurepassword
+        modules:
+          graphite:
+            enabled: true
+            graphite:
+              credSecret: graphite-secret
+              user:
+                secretKey: graphite-user
+              password:
+                secretKey: graphite-password
+    release:
+      name: my-icinga
+    asserts:
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+      - equal:
+          path: metadata.name
+          value: my-icinga-icingaweb2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.modules.graphite.config.graphite.user
+            valueFrom:
+              secretKeyRef:
+                name: graphite-secret
+                key: graphite-user
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: icingaweb.modules.graphite.config.graphite.password
+            valueFrom:
+              secretKeyRef:
+                name: graphite-secret
+                key: graphite-password
+
+  - it: failed deployment of Icinga Web due to partial secret definition
+    values:
+      - required_values_secrets.yaml
+    set:
+      global:
+        api:
+          users:
+            credSecret: api-users
+            director:
+              password:
+            icingaweb:
+              password:
+                secretKey: icingaweb-password
+    release:
+      name: my-icinga
+    asserts:
+      - failedTemplate:
+          errorMessage: "director api user password not set. Set either .Values.global.api.users.director.password.value or .Values.global.api.users.credSecret and .Values.global.api.users.director.password.secretKey"

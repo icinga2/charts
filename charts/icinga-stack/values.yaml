@@ -1,0 +1,651 @@
+icinga2:
+  image:
+    repository: icinga/icinga2
+    tag: 2.13.10
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  service:
+    type: ClusterIP
+    port: 5665
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host:  # Add a host here
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  config:
+    node_name: icinga2-master
+    zone_name: master
+    ticket_salt:
+      value:  # Add random (long!) string here
+      credSecret: # Or use existing secret
+      secretKey:
+    disable_confd: true
+
+  features:
+    # The features are configured as described in the official documentation
+    # at https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#features
+    # Only some features are enabled by default; Some features are missing, for more information
+    # see this project's README.md
+    # `Optional` settings for each features are commented out, all other settings are required when enabling
+    # a feature.
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#apilistener
+    api:
+      enabled: true
+      # accept_commands: false
+      # accept_config: false
+      # crl_path: /var/lib/icinga2/crl/api.crl
+      # bind_host: 127.0.0.1
+      # bind_port: 5665
+      # max_anonymous_clients: 10
+      # cipher_list: ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:AES256-GCM-SHA384:AES128-GCM-SHA256
+      # connect_timeout: 15s
+      # acl_allow_origin:
+      #   - example.com
+      #   - agent1.example.com
+      # environment: ""
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#checkercomponent
+    checker:
+      enabled: true
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#compatlogger
+    compatlog:
+      enabled: false
+      # log_dir: /var/log/icinga2/compat.log
+      # rotation_method: HOURLY
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#filelogger
+    debuglog:
+      enabled: false
+      # path: /var/log/icinga2/debug.log
+      # severity: debug
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#elasticsearchwriter
+    elasticsearch:
+      enabled: false
+      # host: elasticsearch
+      # port: 9200
+      # index: icinga2
+      # enable_send_perfdata: false
+      # flush_threshold: 1024
+      # flush_interval: 10s
+      # credSecret: # used for credentials
+      # tlsSecret: # used for certificates
+      # username: elastic
+      # password: password
+      # enable_tls: false
+      # insecure_noverify: false
+      # caSecretKey: # Secret key to mount at /etc/icinga2-pki/elastic-ca.crt
+      # certSecretKey: # Secret key to mount at /etc/icinga2-pki/elastic-cert.crt
+      # keySecretKey: # Secret key to mount at /etc/icinga2-pki/elastic-cert.key
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#gelfwriter
+    gelf:
+      enabled: false
+      # host: gelf
+      # port: 12201
+      # source: icinga2
+      # enable_send_perfdata: false
+      # enable_tls: false
+      # insecure_noverify: false
+      # tlsSecret: # used for certificates
+      # caSecretKey: # Secret key to mount at /etc/icinga2-pki/gelf/ca.crt
+      # certSecretKey: # Secret key to mount at /etc/icinga2-pki/gelf/cert.crt
+      # keySecretKey: # Secret key to mount at /etc/icinga2-pki/gelf/cert.key
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#graphitewriter
+    graphite:
+      enabled: false
+      # host: graphite
+      # port: 2003
+      # host_name_template: icinga2.$host.name$.$host.check_command$
+      # service_name_template: icinga2.$host.name$.services.$service.name$.$service.check_command$
+      # enable_send_tresholds: false
+      # enable_send_metadata: false
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#icingadb
+    icingadb:
+      enabled: true
+      # credSecret: # used for credentials
+      # tlsSecret: # used for certificates
+      # password:
+      #   value: password # Specify password
+      #   secretKey: password # Or use existing secret
+      # enable_tls: false
+      # certSecretKey: # Secret key to mount at /etc/icinga2-pki/icingadb/cert.crt
+      # keySecretKey: # Secret key to mount at /etc/icinga2-pki/icingadb/cert.key
+      # caSecretKey: # Secret key to mount at /etc/icinga2-pki/icingadb/ca.crt
+      # crlSecretKey: # Secret key to mount at /etc/icinga2/pki/icingadb/crl.pem
+      # cipher_list: ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:AES256-GCM-SHA384:AES128-GCM-SHA256
+      # tls_protocolmin: TLSv1.2
+      # insecure_noverify: false
+      # connect_timeout: 15s
+
+    # https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#influxdb2writer
+    influxdb2:
+      enabled: false
+      # host: influx
+      # port: 8086
+      # organization: monitoring
+      # bucket: icinga2
+      # credSecret: # used for credentials
+      # tlsSecret: # used for certificates
+      # auth_token: securitytoken
+      # ssl_enable: false
+      # ssl_insecure_noverify: false
+      # caSecretKey: # Secret key to mount at /etc/icinga2-pki/influxdb2/ca.crt
+      # certSecretKey: # Secret key to mount at /etc/icinga2-pki/influxdb2/cert.crt
+      # keySecretKey: # Secret key to mount at /etc/icinga2-pki/influxdb2/cert.key
+      # enable_send_thresholds: false
+      # enable_send_metadata: false
+      # flush_threshold: 1024
+      # flush_interval: 10s
+      host_template: |
+        host_template = {
+          measurement = "$host.check_command$"
+          tags = {
+            hostname = "$host.name$"
+          }
+        }
+      service_template: |
+        service_template = {
+          measurement = "$service.check_command$"
+          tags = {
+            hostname = "$host.name$"
+            service = "$service.name$"
+          }
+        }
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#influxdbwriter
+    influxdb:
+      enabled: false
+      # host: influx
+      # port: 8086
+      # database: icinga2
+      # credSecret: # existing secret used for influxdb credentials and basic_auth credentials
+      # tlsSecret: # used for certificates
+      # username:
+      #   value: # Specify username
+      #   secretKey: # Or use existing secret
+      # password:
+      #   value: # Specify password
+      #   secretKey: # Or use existing secret
+      # basic_auth:
+      #   username:
+      #     value: # Specify username
+      #     secretKey: # Or use existing secret
+      #   password:
+      #     value: # Specify password
+      #     secretKey: # Or use existing secret
+      # ssl_enable: false
+      # ssl_insecure_noverify: false
+      # caSecretKey: # Secret key to mount at /etc/icinga2-pki/influxdb/ca.crt
+      # certSecretKey: # Secret key to mount at /etc/icinga2-pki/influxdb/cert.crt
+      # keySecretKey: # Secret key to mount at /etc/icinga2-pki/influxdb/cert.key
+      # enable_send_thresholds: false
+      # enable_send_metadata: false
+      # flush_threshold: 1024
+      # flush_interval: 10s
+      host_template: |
+        host_template = {
+          measurement = "$host.check_command$"
+          tags = {
+            hostname = "$host.name$"
+          }
+        }
+      service_template: |
+        service_template = {
+          measurement = "$service.check_command$"
+          tags = {
+            hostname = "$host.name$"
+            service = "$service.name$"
+          }
+        }
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#filelogger
+    mainlog:
+      enabled: false
+      # path: /var/log/icinga2/icinga2.log
+      # severity: information
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#notificationcomponent
+    notification:
+      enabled: true
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#opentsdbwriter
+    opentsdb:
+      enabled: false
+      # host: opentsdb
+      # port: 4242
+      # enable_generic_metrics: false
+      host_template: |
+        host_template = {
+          metric = "icinga.host"
+          tags = {
+            zone = "$host.zone$"
+          }
+        }
+      service_template: |
+        service_template = {
+          metric = "icinga.service.$service.check_command$"
+          tags = {
+            zone = "$service.zone$"
+          }
+        }
+
+    # For configuration information see https://icinga.com/docs/icinga-2/latest/doc/09-object-types/#sysloglogger
+    syslog:
+      enabled: true
+      # severity: warning
+      # facility: FacilityUser
+
+  persistence:
+    enabled: false
+    size: 5Gi
+    accessMode: ReadWriteOnce
+    # storageClass: ""
+    # volumeName: ""
+    # subPath: ""
+    matchLabels: {}
+    matchExpressions: []
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext:
+    fsGroup: 5665
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+icingadb:
+  enabled: true
+
+  image:
+    repository: icinga/icingadb
+    tag: 1.1.1
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  extraEnvVars: []
+
+icingaweb2:
+  enabled: true
+
+  image:
+    repository: icinga/icingaweb2
+    tag: 2.12.1
+    pullPolicy: Always
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host:  # Add a host here
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  auth:
+    type: db
+    #resource: # Add the name of the db resource used by Icinga Web 2 here
+    admin_user: icingaadmin
+    admin_password:
+      value: # Add a password here
+      credSecret:
+      secretKey:
+
+  modules:
+    audit:
+      enabled: false
+      log:
+        type: syslog
+        ident: icingaweb2-audit
+        facility: auth
+      stream:
+        enabled: false
+        format: json
+        path: /var/log/icingaweb2/audit.json
+
+    businessprocess: {}  # TODO add parsing of existing processes later
+
+    cube:
+      enabled: false
+
+    director:
+      enabled: true
+      kickstart: true
+
+    graphite:
+      enabled: false
+      graphite:
+        url: graphite.example.com
+        credSecret:
+        user:
+          value:
+          secretKey:
+        password:
+          value:
+          secretKey:
+        insecure: 1
+      ui:
+        default_time_range: 1
+        default_time_range_unit: hours
+        disable_no_graphs_found: 1
+      icinga:
+        graphite_writer_host_name_template: null
+        graphite_writer_service_name_template: null
+        customvar_obscured_check_command: null
+
+    icingadb:
+      enabled: true
+
+    incubator:
+      enabled: true
+
+    x509:
+      enabled: false
+      jobs: {}  # TODO: Add this
+      sni: {}  # TODO: Add this
+
+    kubernetes:
+      enabled: true
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  extraEnvVars: []
+
+icinga-kubernetes:
+  enabled: true
+
+  image:
+    repository: icinga/icinga-kubernetes
+    tag: 0.2.0
+    pullPolicy: IfNotPresent
+
+  rbac:
+    create: true
+
+  serviceAccount:
+    create: true
+
+global:
+  api:
+    # host:  # only needed if Icinga 2 runs out of cluster
+    port: 5665
+    users:
+      credSecret: # Existing secret for director and icingaweb password
+      director:
+        password:
+          value: # Add a password here
+          secretKey: # Or specify secret key
+        permissions:
+        - "*"
+
+      icingaweb:
+        password:
+          value: # Add a password here
+          secretKey:  # Or specify secret key
+        permissions:
+        - "*"
+
+  databases:
+    director:
+      database: directordb
+      credSecret: # Existing secret name for username and password
+      username:
+        value: # Set username
+        secretKey: # Or specify secret key
+      password:
+        value: # Add a password here
+        secretKey: # Or specify secret key
+      enabled: true
+      # host: mariadb.example.com
+      # port: 3306
+      persistence:
+        enabled: false
+        size: 5Gi
+        accessMode: ReadWriteOnce
+        # storageClass: ""
+        # volumeName: ""
+        # subPath: ""
+        matchLabels: {}
+        matchExpressions: []
+
+    icingadb:
+      database: icingadb
+      credSecret: # Existing secret name for username and password
+      username:
+        value: # Set username
+        secretKey: # Or specify secret key
+      password:
+        value: # Add a password here
+        secretKey: # Or specify secret key
+      enabled: true
+      # host: mariadb.example.com
+      # port: 3306
+      persistence:
+        enabled: false
+        size: 5Gi
+        accessMode: ReadWriteOnce
+        # storageClass: ""
+        # volumeName: ""
+        # subPath: ""
+        matchLabels: {}
+        matchExpressions: []
+
+    icingaweb2:
+      database: icingaweb2db
+      credSecret: # Existing secret name for username and password
+      username:
+        value: # Set username
+        secretKey: # Or specify secret key
+      password:
+        value: # Add a password here
+        secretKey: # Or specify secret key
+      enabled: true
+      # host: mariadb.example.com
+      # port: 3306
+      persistence:
+        enabled: false
+        size: 5Gi
+        accessMode: ReadWriteOnce
+        # storageClass: ""
+        # volumeName: ""
+        # subPath: ""
+        matchLabels: {}
+        matchExpressions: []
+
+    x509:
+      database: x509db
+      credSecret: # Existing secret name for username and password
+      username:
+        value: # Set username
+        secretKey: # Or specify secret key
+      password:
+        value: # Add a password here
+        secretKey: # Or specify secret key
+      enabled: false
+      # host: mariadb.example.com
+      # port: 3306
+      persistence:
+        enabled: false
+        size: 5Gi
+        accessMode: ReadWriteOnce
+        # storageClass: ""
+        # volumeName: ""
+        # subPath: ""
+        matchLabels: {}
+        matchExpressions: []
+
+    kubernetes:
+      # Note that using secrets is not yet supported for Icinga Kubernetes.
+      database: kubernetes
+      credSecret: # Existing secret name for username and password
+      username:
+        value: # Set username
+        secretKey: # Or specify secret key
+      password:
+        value: # Add a password here
+        secretKey: # Or specify secret key
+      enabled: true
+      # host: mariadb.example.com
+      # port: 3306
+      persistence:
+        enabled: false
+        size: 5Gi
+        accessMode: ReadWriteOnce
+        # storageClass: ""
+        # volumeName: ""
+        # subPath: ""
+        matchLabels: {}
+        matchExpressions: []
+
+  redis:
+    enabled: true
+    # host: redis.example.com
+    # port: 6379

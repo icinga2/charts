@@ -1,0 +1,269 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "icinga2.fullname" . }}-config
+  labels:
+    {{- include "icinga2.labels" . | nindent 4 }}
+data:
+  icinga2.conf: |-
+    {{- include "icinga2.config" . | nindent 4 }}
+  {{- if .Values.features.api.enabled }}
+  api-users.conf: |
+    {{- range $user, $settings := .Values.global.api.users }}
+    {{- if ne $user "credSecret" }} # skip key credSecret
+    {{- $permissions := $settings.permissions | default (list "*") }}
+    object ApiUser {{ $user | quote }} {
+      password = getenv("{{ print "ICINGA_" $user "_API_PASSWORD" | upper }}")
+      permissions = {{ print "[\"" (join "\"," $settings.permissions) "\"]" }}
+    }
+    {{- end }}
+    {{- end }}
+  {{- end }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "icinga2.fullname" . }}-features
+  labels:
+    {{- include "icinga2.labels" . | nindent 4 }}
+data:
+  {{- if .Values.features.api.enabled }}
+  api.conf: |
+    object ApiListener "api" {
+      accept_commands = {{ .Values.features.api.accept_commands | default "false" }}
+      accept_config = {{ .Values.features.api.accept_config | default "false" }}
+      ticket_salt = TicketSalt
+      {{- if .Values.features.api.crl_path }}
+      crl_path = {{ .Values.features.api.crl_path | quote }}
+      {{- end }}
+      {{- if .Values.features.api.bind_host }}
+      bind_host = {{ .Values.features.api.bind_host | quote }}
+      {{- end }}
+      {{- if .Values.features.api.bind_port }}
+      bind_port = {{ .Values.features.api.bind_port }}
+      {{- end }}
+      {{- if .Values.features.api.max_annonymous_clients}}
+      max_anonymous_clients = {{ .Values.features.api.max_annonymous_clients }}
+      {{- end }}
+      cipher_list = "{{ .Values.features.api.cipher_list | default "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:AES256-GCM-SHA384:AES128-GCM-SHA256" }}"
+      connect_timeout = {{ .Values.features.api.connect_timeout | default "15s" }}
+      {{- if .Values.features.api.acl_allow_origin }}
+      access_controll_allow_origin = [{{ join "," (.Values.features.api.acl_allow_origin | quote ) }}]
+      {{- end }}
+      {{- if .Values.features.api.environment }}
+      environment = {{ .Values.features.api.environment | quote }}
+      {{- end }}
+    }
+  {{- end -}}
+  {{- if .Values.features.checker.enabled }}
+  checker.conf: |
+    object CheckerComponent "checker" {}
+  {{- end -}}
+  {{- if .Values.features.compatlog.enabled }}
+  compatlog.conf: |
+    object CompatLogger "compatlog" {
+      log_dir = {{ .Values.features.compatlog.log_dir | default "/var/log/icinga2/compat" | quote }}
+      rotation_method = {{ .Values.features.compatlog.rotation_method | default "HOURLY" | quote }}
+    }
+  {{- end -}}
+  {{- if .Values.features.debuglog.enabled }}
+  debuglog.conf: |
+    object DebugLogger "debuglog" {
+      severity = {{ .Values.features.debuglog.severity | default "debug" | quote}}
+      path = {{ .Values.features.debuglog.path | default "LogDir + \"/debug.log\"" | quote }}
+    }
+  {{- end -}}
+  {{- if .Values.features.elasticsearch.enabled }}
+  elasticsearch.conf: |
+    object ElasticsearchWriter "elasticsearch" {
+      host = {{ .Values.features.elasticsearch.host | default "elasticsearch" | quote }}  // requires a service 'elasticsearch' in the same namespace
+      port = {{ .Values.features.elasticsearch.port | default 9200 }}
+      index = {{ .Values.features.elasticsearch.index | default "icinga2" | quote }}
+      enable_send_perfdata = {{ .Values.features.elasticsearch.enable_default_perfdata | default "false" }}
+      flush_threshold = {{ .Values.features.elasticsearch.flush_threshold | default 1024 }}
+      flush_interval = {{ .Values.features.elasticsearch.flush_interval | default "10s" }}
+      {{- if .Values.features.elasticsearch.username }}
+      username = getenv("ICINGA_ELASTICSEARCH_USERNAME")
+      {{- end }}
+      {{- if .Values.features.elasticsearch.password }}
+      password = getenv("ICINGA_ELASTICSEARCH_PASSWORD")
+      {{- end }}
+      enable_tls = {{ .Values.features.elasticsearch.enable_tls | default "false" }}
+      insecure_noverify = {{ .Values.features.elasticsearch.insecure_noverify | default "false" }}
+      {{- if .Values.features.elasticsearch.enable_tls }}
+      {{- if and .Values.features.elasticsearch.tlsSecret .Values.features.elasticsearch.caSecretKey .Values.features.elasticsearch.certSecretKey .Values.features.elasticsearch.keySecretKey }}
+      ca_path = "/etc/icinga2-pki/elastic/ca.crt"
+      cert_path = "/etc/icinga2-pki/elastic/cert.crt"
+      key_path = "/etc/icinga2-pki/elastic/cert.key"
+      {{- else }}
+        {{ fail "Elasticsearch cert secrets not set. Set .Values.features.elasticsearch.tlsSecret, .Values.features.elasticsearch.caSecretKey, .Values.features.elasticsearch.certSecretKey and .Values.features.elasticsearch.keySecretKey" }}
+      {{- end }}
+      {{- end }}
+      enable_ha = false
+    }
+  {{- end -}}
+  {{- if .Values.features.gelf.enabled }}
+  gelf.conf: |
+    object GelfWriter "gelf" {
+      host = {{ .Values.features.gelf.host | default "gelf" | quote }}  // requires a service 'gelf' in the same namespace
+      port = {{ .Values.features.gelf.port | default 12201 }}
+      enable_send_perfdata = {{ .Values.features.gelf.enable_send_perfdata | default "false" }}
+      enable_tls = {{ .Values.features.gelf.enable_tls | default "false" }}
+      insecure_noverify = {{ .Values.features.gelf.insecure_noverify | default "false" }}
+      {{- if .Values.features.gelf.enable_tls }}
+      {{- if and .Values.features.gelf.tlsSecret .Values.features.gelf.caSecretKey .Values.features.gelf.certSecretKey .Values.features.gelf.keySecretKey }}
+      ca_path = "/etc/icinga2-pki/gelf/ca.crt"
+      cert_path = "/etc/icinga2-pki/gelf/cert.crt"
+      key_path = "/etc/icinga2-pki/gelf/cert.key"
+      {{- else }}
+        {{ fail "GELF cert secrets not set. Set .Values.features.gelf.tlsSecret, .Values.features.gelf.caSecretKey, .Values.features.gelf.certSecretKey and .Values.features.gelf.keySecretKey" }}
+      {{- end }}
+      {{- end }}
+      enable_ha = false
+    }
+  {{- end -}}
+  {{- if .Values.features.graphite.enabled }}
+  graphite.conf: |
+    object GraphiteWriter "graphite" {
+      host = {{ .Values.features.graphite.host | default "graphite" | quote }}  // requires a service 'graphite' in the same namespace
+      port = {{ .Values.features.graphite.port | default 2003 }}
+      host_name_template = {{ .Values.features.graphite.host_name_template | default "icinga2.$host.name$.$host.check_command$" | quote }}
+      service_name_template = {{ .Values.features.graphite.service_name_template | default "icinga2.$host.name$.services.$service.name$.$service.check_command$" | quote }}
+      enable_send_thresholds = {{ .Values.features.graphite.enable_send_thresholds | default "false" }}
+      enable_send_metadata = {{ .Values.features.graphite.enable_send_metadata | default "false" }}
+      enable_ha = false
+    }
+  {{- end -}}
+  {{- if .Values.features.icingadb.enabled }}
+  icingadb.conf: |
+    object IcingaDB "icingadb" {
+        host = {{ if .Values.global.redis.enabled -}} "{{ .Release.Name }}-redis" {{- else }}{{ .Values.global.redis.host | quote }}{{ end }}
+        port = {{ if .Values.global.redis.enabled -}} 6379 {{- else }}{{ .Values.global.redis.port }}{{ end }}
+        {{- if .Values.features.icingadb.password }}
+        password = getenv("ICINGA_ICINGADB_PASSWORD")
+        {{- end }}
+        enable_tls = {{ .Values.features.icingadb.enable_tls | default "false" }}
+        insecure_noverify = {{ .Values.global.redis.insecure_noverify | default "false" }}
+        {{- if .Values.features.icingadb.enable_tls }}
+        {{- if and .Values.features.icingadb.tlsSecret .Values.features.icingadb.caSecretKey .Values.features.icingadb.certSecretKey .Values.features.icingadb.keySecretKey .Values.features.icingadb.crlSecretKey }}
+        cert_path = "/etc/icinga2-pki/icingadb/cert.crt"
+        key_path = "/etc/icinga2-pki/icingadb/cert.key"
+        ca_path = "/etc/icinga2-pki/icingadb/ca.crt"
+        crl_path = "/etc/icinga2-pki/icingadb/crl.pem"
+        {{- else }}
+          {{ fail "icingadb cert secrets not set. Set .Values.features.icingadb.tlsSecret, .Values.features.icingadb.caSecretKey, .Values.features.icingadb.certSecretKey, .Values.features.icingadb.keySecretKey and .Values.features.icingadb.crlSecretKey" }}
+        {{- end }}
+        {{- end }}
+        cipher_list = "{{ .Values.features.icingadb.cipher_list | default "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:AES256-GCM-SHA384:AES128-GCM-SHA256" }}"
+        tls_protocolmin = {{ .Values.features.icingadb.tls_protocolmin | default "TLSv1.2" | quote }}
+        connect_timeout = {{ .Values.features.icingadb.connect_timeout | default "15s" }}
+    }
+  {{- end }}
+  {{- if .Values.features.influxdb2.enabled }}
+  influxdb2.conf: |
+    object Influxdb2Writer "influxdb2" {
+      host = {{ .Values.features.influxdb2.host | default "influx" | quote }}  // requires a service 'influx' in the same namespace
+      port = {{ .Values.features.influxdb2.port | default 8086 }}
+      organization = {{ .Values.features.influxdb2.organization | default "monitoring" | quote }}
+      bucket = {{ .Values.features.influxdb2.bucket | default "icinga2" | quote }}
+      auth_token = getenv("ICINGA_INFLUXDB2_AUTH_TOKEN")
+      flush_threshold = {{ .Values.features.influxdb2.flush_threshold | default 1024 }}
+      flush_interval = {{ .Values.features.influxdb2.flush_interval | default "10s" }}
+      {{- if .Values.features.influxdb2.host_template }}
+      {{ .Values.features.influxdb2.host_template | indent 6}}
+      {{- end -}}
+      {{- if .Values.features.influxdb2.service_template }}
+      {{ .Values.features.influxdb2.service_template | indent 6}}
+      {{- end -}}
+      ssl_enable = {{ .Values.features.influxdb2.ssl_enable | default "false" }}
+      ssl_insecure_noverify = {{ .Values.features.influxdb2.ssl_insecure_noverify | default "false" }}
+      {{- if .Values.features.influxdb2.ssl_enable }}
+      {{- if and .Values.features.influxdb2.tlsSecret .Values.features.influxdb2.caSecretKey .Values.features.influxdb2.certSecretKey .Values.features.influxdb2.keySecretKey }}
+      ssl_ca_cert = "/etc/icinga2-pki/influxdb2/ca.crt"
+      ssl_cert = "/etc/icinga2-pki/influxdb2/cert.crt"
+      ssl_key = "/etc/icinga2-pki/influxdb2/cert.key"
+      {{- else }}
+        {{ fail "influxdb2 cert secrets not set. Set .Values.features.influxdb2.tlsSecret, .Values.features.influxdb2.caSecretKey, .Values.features.influxdb2.certSecretKey and .Values.features.influxdb2.keySecretKey" }}
+      {{- end }}
+      {{- end }}
+      enable_send_thresholds = {{ .Values.features.influxdb2.enable_send_thresholds | default "false" }}
+      enable_send_metadata = {{ .Values.features.influxdb2.enable_send_metadata | default "false" }}
+      enable_ha = false
+    }
+  {{- end -}}
+  {{- if .Values.features.influxdb.enabled }}
+  influxdb.conf: |
+    object InfluxdbWriter "influxdb" {
+      host = {{ .Values.features.influxdb.host | default "influx" | quote }}  // requires a service 'influx' in the same namespace
+      port = {{ .Values.features.influxdb.port | default 8086 }}
+      database = {{ .Values.features.influxdb.database | default "icinga2" | quote }}
+      flush_threshold = {{ .Values.features.influxdb.flush_threshold | default 1024 }}
+      flush_interval = {{ .Values.features.influxdb.flush_interval | default "10s" }}
+      {{- if .Values.features.influxdb.host_template }}
+      {{ .Values.features.influxdb.host_template | indent 6}}
+      {{- end -}}
+      {{- if .Values.features.influxdb.service_template }}
+      {{ .Values.features.influxdb.service_template | indent 6}}
+      {{- end -}}
+      {{- if and .Values.features.influxdb.username .Values.features.influxdb.password }}
+      username = getenv("ICINGA_INFLUXDB_USERNAME")
+      password = getenv("ICINGA_INFLUXDB_PASSWORD")
+      {{- end }}
+      {{- if and .Values.features.influxdb.basic_auth .Values.features.influxdb.basic_auth.username .Values.features.influxdb.basic_auth.password }}
+      basic_auth = {
+        username = getenv("ICINGA_INFLUXDB_BASIC_AUTH_USERNAME")
+        password = getenv("ICINGA_INFLUXDB_BASIC_AUTH_PASSWORD")
+      }
+      {{- end }}
+      ssl_enable = {{ .Values.features.influxdb.ssl_enable | default "false" }}
+      ssl_insecure_noverify = {{ .Values.features.influxdb.ssl_insecure_noverify | default "false" }}
+      {{- if .Values.features.influxdb.ssl_enable }}
+      {{- if and .Values.features.influxdb.tlsSecret .Values.features.influxdb.caSecretKey .Values.features.influxdb.certSecretKey .Values.features.influxdb.keySecretKey }}
+      ssl_ca_cert = "/etc/icinga2-pki/influxdb/ca.crt"
+      ssl_cert = "/etc/icinga2-pki/influxdb/cert.crt"
+      ssl_key = "/etc/icinga2-pki/influxdb/cert.key"
+      {{- else }}
+        {{ fail "influxdb cert secrets not set. Set .Values.features.influxdb.tlsSecret, .Values.features.influxdb.caSecretKey, .Values.features.influxdb.certSecretKey and .Values.features.influxdb.keySecretKey" }}
+      {{- end }}
+      {{- end }}
+      enable_send_thresholds = {{ .Values.features.influxdb.enable_send_thresholds | default "false" }}
+      enable_send_metadata = {{ .Values.features.influxdb.enable_send_metadata | default "false" }}
+      enable_ha = false
+    }
+  {{- end -}}
+  {{- if .Values.features.mainlog.enabled }}
+  mainlog.conf: |
+    object FileLogger "mainlog" {
+      severity = {{ .Values.features.mainlog.severity | default "information" | quote }}
+      path = {{ .Values.features.mainlog.path | default "LogDir + \"/icinga2.log\"" | quote }}
+    }
+  {{- end -}}
+  {{- if .Values.features.notification.enabled }}
+  notification.conf: |
+    object NotificationComponent "notification" {
+      enable_ha = false
+    }
+  {{- end -}}
+  {{- if .Values.features.opentsdb.enabled }}
+  opentsdb.conf: |
+    object OpenTsdbWriter "opentsdb" {
+      host = {{ .Values.features.opentsdb.host | default "opentsdb" | quote }}  // requires a service 'opentsdb' in the same namespace
+      port = {{ .Values.features.opentsdb.port | default 4242 }}
+      enable_generic_metrics = {{ .Values.features.opentsdb.enable_generic_metrics | default "false" }}
+      {{- if .Values.features.opentsdb.host_template }}
+      {{ .Values.features.opentsdb.host_template | indent 6}}
+      {{- end -}}
+      {{- if .Values.features.opentsdb.service_template }}
+      {{ .Values.features.opentsdb.service_template | indent 6}}
+      {{- end -}}
+      enable_ha = false
+    }
+  {{- end -}}
+  {{- if .Values.features.syslog.enabled }}
+  syslog.conf: |
+    object SyslogLogger "syslog" {
+      severity = {{ .Values.features.syslog.severity | default "warning" | quote }}
+      facility = {{ .Values.features.syslog.facility | default "FacilityUser" }}
+    }
+  {{- end -}}

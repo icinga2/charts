@@ -1,0 +1,83 @@
+{{ if .Values.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "icingadb.fullname" . }}
+  labels:
+    {{- include "icingadb.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "icingadb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "icingadb.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "icingadb.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name}}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: ICINGADB_REDIS_HOST
+              value: {{ if .Values.global.redis.enabled }} {{ .Release.Name }}-redis {{ else }} {{ .Values.global.redis.host | quote }} {{ end }}
+            - name: ICINGADB_REDIS_PORT
+              value: {{ if .Values.global.redis.enabled }} "6379" {{ else }} {{ .Values.global.redis.port | quote }} {{ end }}
+            - name: ICINGADB_DATABASE_HOST
+              value: {{ if .Values.global.databases.icingadb.enabled }} {{ .Release.Name }}-icingadb-database {{ else }} {{ .Values.global.databases.icingadb.host | quote }} {{ end }}
+            - name: ICINGADB_DATABASE_PORT
+              value: {{ .Values.global.databases.icingadb.port | default "3306" | quote }}
+            - name: ICINGADB_DATABASE_USER
+              {{- if and .Values.global.databases.icingadb.username .Values.global.databases.icingadb.username.value }}
+              value: {{ .Values.global.databases.icingadb.username.value | quote }}
+              {{- else if and .Values.global.databases.icingadb.username .Values.global.databases.icingadb.credSecret .Values.global.databases.icingadb.username.secretKey }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.databases.icingadb.credSecret | quote }}
+                  key: {{ .Values.global.databases.icingadb.username.secretKey | quote }}
+              {{- else }}
+              {{ fail ".Values.global.databases.icingadb.username not set. Set either .Values.global.databases.icingadb.username.value or .Values.global.databases.icingadb.credSecret and .Values.global.databases.icingadb.username.secretKey" }}
+              {{- end }}
+            - name: ICINGADB_DATABASE_PASSWORD
+              {{- if and .Values.global.databases.icingadb.password .Values.global.databases.icingadb.password.value }}
+              value: {{ .Values.global.databases.icingadb.password.value | quote }}
+              {{- else if and .Values.global.databases.icingadb.password .Values.global.databases.icingadb.credSecret .Values.global.databases.icingadb.password.secretKey }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.databases.icingadb.credSecret | quote }}
+                  key: {{ .Values.global.databases.icingadb.password.secretKey | quote }}
+              {{- else }}
+              {{ fail ".Values.global.databases.icingadb.password not set. Set either .Values.global.databases.icingadb.password.value or .Values.global.databases.icingadb.credSecret and .Values.global.databases.icingadb.password.secretKey" }}
+              {{- end }}
+            - name: ICINGADB_DATABASE_DATABASE
+              value: {{ .Values.global.databases.icingadb.database | default "mysql" | quote }}
+            {{- if .Values.extraEnvVars }}
+            {{- toYaml .Values.extraEnvVars | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end -}}
