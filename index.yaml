@@ -1,6 +1,45 @@
 apiVersion: v1
 entries:
+  icinga-kubernetes:
+  - apiVersion: v2
+    appVersion: 0.2.0
+    created: "2024-11-23T22:13:48.597797238Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 2.x.x
+    description: Icinga Kubernetes
+    digest: fd0b3c5215d779aaf876adaba173b64bbf6a38764a4f20218c2a652e776f47d6
+    maintainers:
+    - email: info@icinga.com
+      name: Icinga GmbH
+      url: https://icinga.com
+    name: icinga-kubernetes
+    type: application
+    urls:
+    - https://github.com/icinga2/charts/releases/download/icinga-kubernetes-0.3.1/icinga-kubernetes-0.3.1.tgz
+    version: 0.3.1
   icinga-stack:
+  - apiVersion: v2
+    appVersion: 0.5.0
+    created: "2024-11-23T22:13:48.702687559Z"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 2.x.x
+    description: Icinga is a monitoring system which checks the availability of your
+      network resources, notifies users of outages, and generates performance data
+      for reporting.
+    digest: 47572fac9af839798c9703b74c31d37c6319086c5ee8eb3f3860580304884e64
+    maintainers:
+    - email: daniel.bodky@netways.de
+      name: Daniel Bodky
+      url: https://github.com/mocdaniel
+    name: icinga-stack
+    type: application
+    urls:
+    - https://github.com/icinga2/charts/releases/download/icinga-stack-0.5.2/icinga-stack-0.5.2.tgz
+    version: 0.5.2
   - apiVersion: v2
     appVersion: 0.5.0
     created: "2024-11-23T16:25:07.5527158Z"
@@ -823,4 +862,4 @@ entries:
     urls:
     - https://github.com/icinga2/charts/releases/download/icinga2-agent-0.10.1/icinga2-agent-0.10.1.tgz
     version: 0.10.1
-generated: "2024-11-23T21:47:17.987096316Z"
+generated: "2024-11-23T22:13:48.702764544Z"
