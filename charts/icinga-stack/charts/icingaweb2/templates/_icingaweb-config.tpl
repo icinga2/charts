@@ -7,7 +7,7 @@
 - name: icingaweb.modules.director.kickstart.config.endpoint
   value: icinga2-master
 - name: icingaweb.modules.director.kickstart.config.host
-  value: {{ .Release.Name }}-icinga2
+  value: {{ .Values.config.node_name | quote }}
 - name: icingaweb.modules.director.kickstart.config.username
   value: director
 - name: icingaweb.modules.director.kickstart.config.password
