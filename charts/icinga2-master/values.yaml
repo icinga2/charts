@@ -100,17 +100,6 @@ icinga2:
 
   influxdb:
     enable: false
-    version: "v1"
-    repository: influxdb
-    tag: "1.7"
-    port: "8086"
-
-    adminUser: "root"
-    adminPass: "ChangeMe123"
-    db: "icinga2"
-    user: "icinga2"
-    pass: "ChangeMe123"
-
     # v2
     adminToken: ""
     organization: monitoring
