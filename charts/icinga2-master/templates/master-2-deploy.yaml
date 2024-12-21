@@ -21,6 +21,8 @@ spec:
   template:
 
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/master-2-secret.yaml") . | sha256sum }}
       labels:
         {{- include "icinga2.selectorLabels" . | nindent 8 }}
         component: icinga2-master-2

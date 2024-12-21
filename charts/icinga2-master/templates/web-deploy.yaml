@@ -20,6 +20,8 @@ spec:
   template:
 
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/web-secret.yaml") . | sha256sum }}
       labels:
         {{- include "icinga2.selectorLabels" . | nindent 8 }}
         component: web
